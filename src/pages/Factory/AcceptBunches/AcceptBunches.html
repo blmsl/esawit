@@ -1,7 +1,7 @@
-<ion-header>
+<!-- <ion-header>
   <ion-navbar class="bgColor-darkBlue">
     <ion-avatar class="logoSize" item-start>
-      <img src="../../../assets/img/eSawitLogo.png">
+      <img src="assets/img/eSawitLogo.png">
     </ion-avatar>
     <div class="headerInfo">
       <ion-fab top right edge class="topZero rightZero">
@@ -13,9 +13,9 @@
       </ion-fab>
     </div>
   </ion-navbar>
-</ion-header>
+</ion-header> -->
 
-<ion-content class="bgColor-lightGrey">
+<ion-content class="bgColor-lightGrey contentMarginTop">
   <div class="headerBox bgColor-gradOrange">
     <div class="headerBoxTitle2">{{ "_ACCEPT_BUNCHES_HEADER" | translate }}</div>
   </div>
@@ -43,7 +43,7 @@
         </ion-item>
         <ion-item>
           <ion-label floating>{{ "_TOTAL_BUNCHES_LBL" | translate }}</ion-label>
-          <ion-input formControlName="bunchCount" highlight-color="energized" type="text"></ion-input>
+          <ion-input formControlName="bunchCount" highlight-color="energized" type="number"></ion-input>
         </ion-item>
         <button class="formBtnCircle" type="submit" ion-button full [disabled]="!authForm.valid">{{ "_SUBMIT_BTN" | translate }}</button>
       </form>

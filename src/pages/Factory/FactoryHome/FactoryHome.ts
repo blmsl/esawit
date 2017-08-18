@@ -1,5 +1,5 @@
 ﻿import { Component } from '@angular/core';
-import { NavController, Platform, ActionSheetController } from 'ionic-angular';
+import { App,NavController, Platform, ActionSheetController } from 'ionic-angular';
 import { AcceptBunchesPage } from '../AcceptBunches/AcceptBunches';
 import { AcceptedBunchesHistoryPage } from '../AcceptedBunchesHistory/AcceptedBunchesHistory';
 import { TranslateService } from '@ngx-translate/core';
@@ -13,13 +13,14 @@ import { Subscription } from 'rxjs/Subscription';
 })
 export class FactoryHomePage {
     ifConnect: Subscription;
-    constructor(private network: Network, private myCloud: StorageService, public navCtrl: NavController, public platform: Platform, public actionsheetCtrl: ActionSheetController, public translate: TranslateService, public translateService: TranslateService) {
-        this.translateToEnglish();
+    constructor(public appCtrl: App,private network: Network, private myCloud: StorageService, public navCtrl: NavController, public platform: Platform, public actionsheetCtrl: ActionSheetController, public translate: TranslateService, public translateService: TranslateService) {
+        // this.translateToEnglish();
+    }
 
-        if (this.network.type != "none") {
-            this.myCloud.saveUnloadToCloudFromSQLite();
-            this.myCloud.syncUnloadHistoryCloudToSQLite();
-        }
+    syncAndRefresh() {
+        this.myCloud.saveUnloadToCloudFromSQLite();
+        this.myCloud.syncUnloadHistoryCloudToSQLite();
+
         //-----------------------Offline Sync---------------------------
         this.myCloud.getCloudMasterLocations();
         this.myCloud.getVehicleLocationListFromCloud();
@@ -33,42 +34,46 @@ export class FactoryHomePage {
         this.myCloud.getVehicleDriverListFromCloud();
 
         //----------------------Driver Vehicle----------------------
-
     }
 
     //-----------------------Offline Sync---------------------------
-    ionViewDidEnter() {
+    ionViewWillEnter() {
+        if (this.network.type != "none") {
+            this.syncAndRefresh();
+        }
         this.ifConnect = this.network.onConnect().subscribe(data => {
-            this.myCloud.saveUnloadToCloudFromSQLite();
-            this.myCloud.syncUnloadHistoryCloudToSQLite();
-        }, error => alert('Error In SurveyorHistory :' + error));
+            this.syncAndRefresh();
+        }, error => console.log('Error In SurveyorHistory :' + error));
     }
+
     ionViewWillLeave() {
         this.ifConnect.unsubscribe();
     }
     //-----------------------End Offline Sync---------------------------
 
     public NewAcceptance() {
-        this.navCtrl.push(AcceptBunchesPage, {});
+        this.appCtrl.getRootNav().setRoot(AcceptBunchesPage);
+        // this.navCtrl.setRoot(AcceptBunchesPage);
     }
     public GetHistory() {
-        this.navCtrl.push(AcceptedBunchesHistoryPage, {});
+       this.appCtrl.getRootNav().setRoot(AcceptedBunchesHistoryPage);
+        // this.navCtrl.setRoot(AcceptedBunchesHistoryPage);
     }
 
     //---------------------Language module start---------------------//
-    public translateToEnglishClicked: boolean = false;
-    public translateToMalayClicked: boolean = true;
+    // public translateToEnglishClicked: boolean = false;
+    // public translateToMalayClicked: boolean = true;
 
-    public translateToEnglish() {
-        this.translateService.use('en');
-        this.translateToMalayClicked = !this.translateToMalayClicked;
-        this.translateToEnglishClicked = !this.translateToEnglishClicked;
-    }
+    // public translateToEnglish() {
+    //     this.translateService.use('en');
+    //     this.translateToMalayClicked = !this.translateToMalayClicked;
+    //     this.translateToEnglishClicked = !this.translateToEnglishClicked;
+    // }
 
-    public translateToMalay() {
-        this.translateService.use('ms');
-        this.translateToEnglishClicked = !this.translateToEnglishClicked;
-        this.translateToMalayClicked = !this.translateToMalayClicked;
-    }
+    // public translateToMalay() {
+    //     this.translateService.use('ms');
+    //     this.translateToEnglishClicked = !this.translateToEnglishClicked;
+    //     this.translateToMalayClicked = !this.translateToMalayClicked;
+    // }
     //---------------------Language module end---------------------//
 }

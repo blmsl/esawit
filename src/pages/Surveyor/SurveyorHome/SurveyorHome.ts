@@ -15,54 +15,58 @@ export class SurveyorHomePage {
     ifConnect: Subscription;
 
     constructor(private network: Network, private myCloud: StorageService, public navCtrl: NavController, public platform: Platform, public actionsheetCtrl: ActionSheetController, public translate: TranslateService, public translateService: TranslateService) {
-        this.translateToEnglish();
+        // this.translateToEnglish(); 
+    }
 
+     SyncAndRefresh() {
+        this.myCloud.saveSurveyToCloudFromSQLite();
+        this.myCloud.syncHistoryCloudToSQLite();
+    }
+
+    ionViewWillEnter() {
         if (this.network.type != "none") {
-            this.myCloud.saveSurveyToCloudFromSQLite();
-            this.myCloud.syncHistoryCloudToSQLite();
+            this.SyncAndRefresh();
         }
-        //-----------------------Offline Sync---------------------------
+        this.ifConnect = this.network.onConnect().subscribe(data => {
+            this.SyncAndRefresh();
+        }, error => console.error(error));
+
+         //-----------------------Offline Sync---------------------------
         this.myCloud.getUserLocationListFromCloud();
         this.myCloud.syncHistoryCloudToSQLite();
         //-----------------------End Offline Sync---------------------------
-
     }
 
     //-----------------------Offline Sync---------------------------
-    ionViewDidEnter() {
-        this.ifConnect = this.network.onConnect().subscribe(data => {
-            this.myCloud.saveSurveyToCloudFromSQLite();
-            this.myCloud.syncHistoryCloudToSQLite();
-        }, error => alert('Error In SurveyorHistory :' + error));
-    }
+  
     ionViewWillLeave() {
         this.ifConnect.unsubscribe();
     }
     //-----------------------End Offline Sync---------------------------
 
     public NewCount() {
-        this.navCtrl.push(CountBunchesPage, {});
+        this.navCtrl.setRoot(CountBunchesPage, {});
 
     }
     public GetCountHistory() {
-        this.navCtrl.push(CountBunchesHistoryPage, {});
+        this.navCtrl.setRoot(CountBunchesHistoryPage, {});
 
     }
 
     //---------------------Language module start---------------------//
-    public translateToEnglishClicked: boolean = false;
-    public translateToMalayClicked: boolean = true;
+    // public translateToEnglishClicked: boolean = false;
+    // public translateToMalayClicked: boolean = true;
 
-    public translateToEnglish() {
-        this.translateService.use('en');
-        this.translateToMalayClicked = !this.translateToMalayClicked;
-        this.translateToEnglishClicked = !this.translateToEnglishClicked;
-    }
+    // public translateToEnglish() {
+    //     this.translateService.use('en');
+    //     this.translateToMalayClicked = !this.translateToMalayClicked;
+    //     this.translateToEnglishClicked = !this.translateToEnglishClicked;
+    // }
 
-    public translateToMalay() {
-        this.translateService.use('ms');
-        this.translateToEnglishClicked = !this.translateToEnglishClicked;
-        this.translateToMalayClicked = !this.translateToMalayClicked;
-    }
+    // public translateToMalay() {
+    //     this.translateService.use('ms');
+    //     this.translateToEnglishClicked = !this.translateToEnglishClicked;
+    //     this.translateToMalayClicked = !this.translateToMalayClicked;
+    // }
     //---------------------Language module end---------------------//
 }
